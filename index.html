@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b5d3b">
+<link rel="manifest" href="manifest.webmanifest">
+<title>COURTWISE AI</title>
+<style>
+:root{--green:#0b5d3b;--green2:#138653;--bg:#f3f7f4;--ink:#14231a;--muted:#63736a;--card:#fff;--line:#dce7df;--red:#fee7e5;--redink:#a5231b;--yellow:#fff4cc;--yellowink:#795700}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(130deg,#06452c,#138653);color:white;padding:22px 17px 18px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:23px;letter-spacing:.6px}header p{margin:4px 0 0;color:#d9f2e4;font-size:12px}
+nav{display:flex;gap:7px;overflow:auto;padding:10px;background:#e7f0ea;position:sticky;top:83px;z-index:4}
+nav button{border:0;border-radius:999px;padding:9px 13px;background:#d5e5da;color:#17452e;font-weight:650;white-space:nowrap}
+nav button.active{background:var(--green);color:#fff}
+main{max-width:920px;margin:auto;padding:14px}
+section{display:none}section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px;margin:0 0 13px;box-shadow:0 2px 9px #1231}
+h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:0 0 8px}
+small,.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:650;margin-bottom:4px}
+input,select,textarea{width:100%;border:1px solid #cbd9cf;border-radius:9px;padding:10px;background:white;color:var(--ink);font:inherit}
+textarea{min-height:125px;resize:vertical}
+button.primary{border:0;background:var(--green);color:white;border-radius:10px;padding:11px 15px;font-weight:700}
+button.secondary{border:1px solid #b8cbbd;background:#f7fbf8;color:var(--green);border-radius:10px;padding:10px 13px;font-weight:650}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.result{background:#edf7f0;border-radius:12px;padding:13px;margin-top:12px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.metric{background:white;border:1px solid var(--line);border-radius:10px;padding:10px}
+.metric b{display:block;font-size:20px;color:var(--green)}
+.extremes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.extreme{padding:12px;border-radius:12px}
+.red{background:var(--red);color:var(--redink)}.yellow{background:var(--yellow);color:var(--yellowink)}
+.extreme p{margin:5px 0;font-size:13px}.extreme strong{font-size:21px}
+.status{font-weight:750}.good{color:#08743d}.warn{color:#9a6500}.bad{color:#b42318}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+.pill{display:inline-block;border-radius:999px;padding:3px 8px;background:#e9f2ec;color:var(--green);font-size:11px;font-weight:700}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><h1>🏀 COURTWISE AI</h1><p>GURU Basketball Totals Lab · Manual-first prototype</p></header>
+<nav>
+<button class="active" data-tab="analyzer">GURU Analyzer</button>
+<button data-tab="extremes">Extreme Engine</button>
+<button data-tab="paste">Paste Results</button>
+<button data-tab="market">Market</button>
+<button data-tab="history">History</button>
+</nav>
+<main>
+<section id="analyzer" class="active">
+<div class="card">
+<h2>GURU Match Analyzer</h2>
+<p class="muted">Enter verified averages. The baseline projection is deliberately transparent; missing values are never filled in automatically.</p>
+<div class="grid">
+<div><label>Home team</label><input id="homeName" placeholder="e.g. Home team"></div>
+<div><label>Away team</label><input id="awayName" placeholder="e.g. Away team"></div>
+<div><label>Home PPG</label><input id="hPPG" type="number" step=".1" placeholder="—"></div>
+<div><label>Home points allowed per game</label><input id="hPAPG" type="number" step=".1" placeholder="—"></div>
+<div><label>Away PPG</label><input id="aPPG" type="number" step=".1" placeholder="—"></div>
+<div><label>Away points allowed per game</label><input id="aPAPG" type="number" step=".1" placeholder="—"></div>
+<div><label>Home injury / availability adjustment (points)</label><input id="hAdj" type="number" step=".1" value="0"></div>
+<div><label>Away injury / availability adjustment (points)</label><input id="aAdj" type="number" step=".1" value="0"></div>
+<div><label>Home fatigue adjustment (points)</label><input id="hFat" type="number" step=".1" value="0"></div>
+<div><label>Away fatigue adjustment (points)</label><input id="aFat" type="number" step=".1" value="0"></div>
+<div><label>League duration</label><select id="duration"><option value="40">40 minutes</option><option value="48" selected>48 minutes</option><option value="other">Other / unknown</option></select></div>
+<div><label>Market settlement</label><select id="ot"><option value="yes" selected>Including overtime</option><option value="no">Regulation only</option></select></div>
+<div><label>Sportsbook total line</label><input id="line" type="number" step=".5" placeholder="e.g. 164.5"></div>
+<div><label>Minimum evidence sample (each side)</label><input id="sample" type="number" min="0" step="1" value="10"></div>
+</div>
+<div class="actions"><button class="primary" onclick="analyze()">Run GURU analysis</button><button class="secondary" onclick="clearAnalyzer()">Clear</button></div>
+<div id="analysisResult"></div>
+</div>
+<div class="card"><h3>GURU method status</h3><p class="muted">This prototype currently calculates the PPG/PAPG baseline. Venue balance, last-10 extremes, recent form, efficiency, player minutes, verified injuries and market movement require entered or connected source data. No prediction is guaranteed.</p></div>
+</section>
+
+<section id="extremes">
+<div class="card">
+<h2>GURU Extreme-Score Engine</h2>
+<p class="muted">Use the home team's last 10 away matches (red) and the away team's last 10 home matches (yellow). Paste or add records in the Results tab first.</p>
+<div class="grid">
+<div><label>Home team</label><input id="exHome" placeholder="Home team name"></div>
+<div><label>Away team</label><input id="exAway" placeholder="Away team name"></div>
+</div>
+<div class="actions"><button class="primary" onclick="calculateExtremes()">Calculate extremes</button></div>
+<div id="extremeResult"></div>
+</div>
+</section>
+
+<section id="paste">
+<div class="card">
+<h2>Paste & verify previous results</h2>
+<p class="muted">One match per line. Recommended format: <b>YYYY-MM-DD,Home Team,Home Points,Away Team,Away Points</b>. You can also paste a tab-separated table with the same five columns. Records are saved on this device.</p>
+<textarea id="pasteArea" placeholder="2026-11-20,Team A,88,Team B,79&#10;2026-11-17,Team C,76,Team A,82"></textarea>
+<div class="actions"><button class="primary" onclick="importResults()">Verify & import results</button><button class="secondary" onclick="document.getElementById('pasteArea').value=''">Clear text</button></div>
+<div id="importResult"></div>
+</div>
+<div class="card"><h3>Saved results</h3><div id="resultsTable"></div><div class="actions"><button class="secondary" onclick="exportResults()">Export CSV</button><button class="secondary" onclick="clearResults()">Delete all results</button></div></div>
+</section>
+
+<section id="market">
+<div class="card">
+<h2>Sportsbook Market Monitor</h2>
+<p class="muted">Enter opening and current lines and decimal odds. Implied probabilities are normalized to remove the two-way overround approximately.</p>
+<div class="grid">
+<div><label>Opening total</label><input id="openLine" type="number" step=".5"></div>
+<div><label>Current total</label><input id="currentLine" type="number" step=".5"></div>
+<div><label>Over odds</label><input id="overOdds" type="number" step=".01"></div>
+<div><label>Under odds</label><input id="underOdds" type="number" step=".01"></div>
+</div>
+<div class="actions"><button class="primary" onclick="marketCalc()">Calculate market view</button></div>
+<div id="marketResult"></div>
+</div>
+</section>
+
+<section id="history">
+<div class="card"><h2>Prediction History</h2><p class="muted">Predictions are stored locally in this browser on this device.</p><div id="historyTable"></div><div class="actions"><button class="secondary" onclick="exportHistory()">Export history CSV</button><button class="secondary" onclick="clearHistory()">Clear history</button></div></div>
+</section>
+</main>
+<footer>COURTWISE AI · Prototype build 0.1 · No live data feed or bookmaker connection is active.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+let results=load('cw_results',[]), history=load('cw_history',[]);
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active');renderResults();renderHistory()}));
+function num(id){let v=$(id).value.trim();return v===''?null:Number(v)}
+function fmt(x){return Number.isFinite(x)?x.toFixed(1):'—'}
+function analyze(){
+ const vals=['hPPG','hPAPG','aPPG','aPAPG'].map(num);
+ if(vals.some(v=>v===null)||!$('homeName').value.trim()||!$('awayName').value.trim()){ $('analysisResult').innerHTML='<p class="bad">Enter both team names and all four PPG/PAPG values. Missing statistics will not be invented.</p>';return}
+ const [hPPG,hPAPG,aPPG,aPAPG]=vals;
+ const hAdj=(num('hAdj')||0)+(num('hFat')||0),aAdj=(num('aAdj')||0)+(num('aFat')||0);
+ const home=(hPPG+aPAPG)/2-hAdj,away=(aPPG+hPAPG)/2-aAdj,total=home+away,line=num('line');
+ let lean='No bet / insufficient market edge',edge=null;
+ if(line!==null){edge=line-total;if(edge>=4)lean='Cautious UNDER lean';else if(edge<=-4)lean='Cautious OVER lean';else lean='No bet: line is close to projection'}
+ const n=num('sample')||0,confidence=(n>=10&&Math.abs(edge??0)>=6)?'Provisional stronger signal':(n>=5&&Math.abs(edge??0)>=4)?'Provisional moderate signal':'Low / uncalibrated confidence';
+ const record={date:new Date().toLocaleString(),homeName:$('homeName').value,awayName:$('awayName').value,home:fmt(home),away:fmt(away),total:fmt(total),line:line===null?'—':line,lean};
+ $('analysisResult').innerHTML=`<div class="result"><div class="metrics"><div class="metric"><small>Expected home points</small><b>${fmt(home)}</b></div><div class="metric"><small>Expected away points</small><b>${fmt(away)}</b></div><div class="metric"><small>Projected total</small><b>${fmt(total)}</b></div><div class="metric"><small>Line minus projection</small><b>${edge===null?'—':fmt(edge)}</b></div></div><p><b>Assessment:</b> ${lean}</p><p><b>Confidence:</b> ${confidence}</p><small>Baseline: Home = (home PPG + away PAPG) ÷ 2; Away = (away PPG + home PAPG) ÷ 2. Adjustments are manually entered point estimates. Duration: ${$('duration').value} min; settlement: ${$('ot').value==='yes'?'OT included':'regulation only'}.</small><div class="actions"><button class="secondary" onclick='savePrediction(${JSON.stringify(record).replace(/'/g,"&#39;")})'>Save prediction</button></div></div>`;
+}
+function savePrediction(r){history.unshift(r);save('cw_history',history);renderHistory();alert('Prediction saved on this device.')}
+function clearAnalyzer(){['homeName','awayName','hPPG','hPAPG','aPPG','aPAPG','line'].forEach(x=>$(x).value='');['hAdj','aAdj','hFat','aFat'].forEach(x=>$(x).value='0');$('analysisResult').innerHTML=''}
+function importResults(){
+ const lines=$('pasteArea').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),added=[],errors=[],seen=new Set(results.map(r=>[r.date,r.home.toLowerCase(),r.hp,r.away.toLowerCase(),r.ap].join('|')));
+ lines.forEach((line,i)=>{let p=line.includes('\t')?line.split('\t'):line.split(',');p=p.map(x=>x.trim());if(i===0&&/date/i.test(p[0]))return;
+ if(p.length!==5){errors.push(`Line ${i+1}: expected 5 columns`);return}
+ const [date,home,hpS,away,apS]=p,hp=Number(hpS),ap=Number(apS);
+ if(!date||!home||!away||!Number.isFinite(hp)||!Number.isFinite(ap)||hp<0||ap<0||hp>250||ap>250){errors.push(`Line ${i+1}: invalid date, team or score`);return}
+ if(home.toLowerCase()===away.toLowerCase()){errors.push(`Line ${i+1}: same team listed twice`);return}
+ const key=[date,home.toLowerCase(),hp,away.toLowerCase(),ap].join('|');if(seen.has(key)){errors.push(`Line ${i+1}: duplicate record`);return}seen.add(key);added.push({date,home,hp,away,ap,total:hp+ap});
+ });
+ results=results.concat(added);save('cw_results',results);
+ $('importResult').innerHTML=`<div class="result"><b class="good">${added.length} records imported.</b><br>${errors.length?'<b class="warn">Issues:</b><br>'+errors.map(e=>esc(e)).join('<br>'):'No format or duplicate issues found.'}<p class="muted">This checks structure and duplicates, not whether the scores match an official source.</p></div>`;
+ renderResults();
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function calculateExtremes(){
+ const hn=$('exHome').value.trim().toLowerCase(),an=$('exAway').value.trim().toLowerCase();
+ if(!hn||!an){$('extremeResult').innerHTML='<p class="bad">Enter both team names.</p>';return}
+ const awayGames=results.filter(r=>r.home.toLowerCase()===an&&r.away.toLowerCase()===hn).slice(-10);
+ const homeGames=results.filter(r=>r.home.toLowerCase()===an&&r.away.toLowerCase()===hn); // deliberately replaced below
+ // Home team's away games: home team appears in away column.
+ const hAway=results.filter(r=>r.away.toLowerCase()===hn).slice(-10);
+ // Away team's home games: away team appears in home column.
+ const aHome=results.filter(r=>r.home.toLowerCase()===an).slice(-10);
+ const maxTotal=hAway.length?Math.max(...hAway.map(r=>r.total)):null;
+ const maxScored=hAway.length?Math.max(...hAway.map(r=>r.ap)):null;
+ const maxConceded=hAway.length?Math.max(...hAway.map(r=>r.hp)):null;
+ const minTotal=aHome.length?Math.min(...aHome.map(r=>r.total)):null;
+ const minScored=aHome.length?Math.min(...aHome.map(r=>r.hp)):null;
+ const minConceded=aHome.length?Math.min(...aHome.map(r=>r.ap)):null;
+ $('extremeResult').innerHTML=`<div class="extremes"><div class="extreme red"><b>RED · ${esc($('exHome').value)} away fixtures</b><p>Sample: ${hAway.length}/10</p><p>Highest combined total</p><strong>${maxTotal??'Insufficient data'}</strong><p>Highest home-team points scored: <b>${maxScored??'—'}</b></p><p>Highest points conceded: <b>${maxConceded??'—'}</b></p></div><div class="extreme yellow"><b>YELLOW · ${esc($('exAway').value)} home fixtures</b><p>Sample: ${aHome.length}/10</p><p>Lowest combined total</p><strong>${minTotal??'Insufficient data'}</strong><p>Lowest away-team points scored: <b>${minScored??'—'}</b></p><p>Lowest points conceded: <b>${minConceded??'—'}</b></p></div></div><p class="muted">Note: records are filtered by the named team and venue, but league/season filtering and official-source verification are not yet connected. Add only the intended competition's records for a clean sample.</p>`;
+}
+function renderResults(){if(!$('resultsTable'))return;$('resultsTable').innerHTML=results.length?`<table><tr><th>Date</th><th>Fixture</th><th>Score</th><th>Total</th></tr>${results.slice(-100).reverse().map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.home)} – ${esc(r.away)}</td><td>${r.hp}–${r.ap}</td><td>${r.total}</td></tr>`).join('')}</table>`:'<p class="muted">No results imported yet.</p>'}
+function renderHistory(){if(!$('historyTable'))return;$('historyTable').innerHTML=history.length?`<table><tr><th>Date</th><th>Fixture</th><th>Projection</th><th>Line</th><th>Assessment</th></tr>${history.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.homeName)} – ${esc(r.awayName)}</td><td>${r.total}</td><td>${r.line}</td><td>${esc(r.lean)}</td></tr>`).join('')}</table>`:'<p class="muted">No saved predictions yet.</p>'}
+function csvDownload(name,rows){let csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportResults(){csvDownload('courtwise-results.csv',[['date','home','home_points','away','away_points','total'],...results.map(r=>[r.date,r.home,r.hp,r.away,r.ap,r.total])])}
+function exportHistory(){csvDownload('courtwise-history.csv',[['date','home','away','expected_home','expected_away','projected_total','market_line','assessment'],...history.map(r=>[r.date,r.homeName,r.awayName,r.home,r.away,r.total,r.line,r.lean])])}
+function clearResults(){if(confirm('Delete all saved results from this device?')){results=[];save('cw_results',results);renderResults();$('extremeResult').innerHTML=''}}
+function clearHistory(){if(confirm('Delete prediction history from this device?')){history=[];save('cw_history',history);renderHistory()}}
+function marketCalc(){let o=num('openLine'),c=num('currentLine'),oo=num('overOdds'),uo=num('underOdds');if([o,c,oo,uo].some(v=>v===null)||oo<=1||uo<=1){$('marketResult').innerHTML='<p class="bad">Enter both lines and valid decimal odds greater than 1.00.</p>';return}let po=1/oo,pu=1/uo,sum=po+pu,move=c-o;$('marketResult').innerHTML=`<div class="result"><p>Line movement: <b>${move>0?'+':''}${fmt(move)} points</b> (${move>0?'moved up':move<0?'moved down':'unchanged'})</p><div class="metrics"><div class="metric"><small>Normalized Over probability</small><b>${(po/sum*100).toFixed(1)}%</b></div><div class="metric"><small>Normalized Under probability</small><b>${(pu/sum*100).toFixed(1)}%</b></div></div><p class="muted">Odds-derived probabilities are market estimates, not model probabilities.</p></div>`}
+renderResults();renderHistory();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
